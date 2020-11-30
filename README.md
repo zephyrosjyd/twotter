@@ -1,5 +1,13 @@
 # twotter
 
+## Prerequisites
+```
+yarn global add @vue/cli
+
+# optional
+vue ui
+```
+
 ## Project setup
 ```
 yarn install
