@@ -66,6 +66,7 @@ export default {
   .create-twoot-panel__submit {
     display: flex;
     justify-content: space-between;
+    margin-top: 10px;
     .create-twoot-type {
       padding: 10px 0;
     }
@@ -87,7 +88,7 @@ export default {
     .create-twoot-panel__submit {
       button {
         background-color: red;
-        color: white;
+        color: gray;
       }
     }
   }

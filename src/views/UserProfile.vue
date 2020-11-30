@@ -1,18 +1,19 @@
 <template>
   <div class="user-profile">
     <div class="user-profile__user-panel">
-      <h1 class="user-profile__username">@{{ user.username }}</h1>
-      <div class="user-profile__admin-badge" v-if="user.isAdmin"> Admin </div>
+      <h1 class="user-profile__username">@{{ state.user.username }}</h1>
+      <!-- <h2>{{ userId }}</h2> -->
+      <div class="user-profile__admin-badge" v-if="state.user.isAdmin"> Admin </div>
       <div class="user-profile__follower-count">
-        <strong>Followers: </strong> {{ followers }}
+        <strong>Followers: </strong> {{ state.followers }}
       </div>
       <CreateTwootPanel @add-twoot="addTwoot" />
     </div>
     <div class="user-profile__twoots-wrapper">
       <TwootItem
-        v-for="twoot in user.twoots"
+        v-for="twoot in state.user.twoots"
         :key="twoot.id"
-        :username="user.username"
+        :username="state.user.username"
         :twoot="twoot"
         @favorite="toggleFavorite"
       />
@@ -21,52 +22,49 @@
 </template>
 
 <script>
-import TwootItem from './TwootItem';
-import CreateTwootPanel from './CreaateTwootPanel';
+import { reactive, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { users } from '../assets/users';
+import TwootItem from '@/components/TwootItem';
+import CreateTwootPanel from '@/components/CreaateTwootPanel';
 
 export default {
   name: 'UserProfile',
   components: { TwootItem, CreateTwootPanel },
-  data() {
-    return {
+  setup() {
+    const { value: { params }} = useRouter().currentRoute;
+    const userId = computed(() => params.userId);
+
+    // if (userId) fetchUserFromApi(userId)
+
+    const state = reactive({
       followers: 0,
-      user: {
-        id: 1,
-        username: '_Zephyros',
-        firstName: 'Luke',
-        lastName: 'Ji',
-        email: 'zephyrosjyd@gmail.com',
-        isAdmin: true,
-        twoots: [
-          { id: 1, content: 'Twotter is amazing!' },
-          { id: 2, content: "Don't forget to subscriber to The Earth is Square!" },
-        ]
-      }
+      user: users[userId.value - 1] || users[0]
+    });
+
+    function toggleFavorite(id) {
+      console.log(`favorited twoot is #${id}`);
     }
+    function addTwoot(twoot) {
+      state.user.twoots.unshift({
+        id: state.user.twoots.length + 1, content: twoot
+      });
+    }
+
+    return {
+      state,
+      toggleFavorite,
+      addTwoot,
+      userId,
+    };
   },
   watch: {
     followers(newFollowerCount, oldFollowerCount) {
       if (oldFollowerCount < newFollowerCount) {
-        console.log(`${this.user.username} has gained a follower!`);
+        console.log(`${this.state.user.username} has gained a follower!`);
       }
     }
   },
-  methods: {
-    followUser() {
-      this.followers++;
-    },
-    toggleFavorite(id) {
-      console.log(`favorited twoot is #${id}`);
-    },
-    addTwoot(twoot) {
-      this.user.twoots.unshift({
-        id: this.user.twoots.length + 1, content: twoot
-      });
-    },
-  },
-  mounted() {
-    this.followUser();
-  }
 }
 </script>
 
